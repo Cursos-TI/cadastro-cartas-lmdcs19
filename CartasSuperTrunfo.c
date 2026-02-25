@@ -8,6 +8,8 @@
  *   - Área (km²)
  *   - PIB (em bilhões de reais)
  *   - Número de pontos turísticos
+ *   - Densidade Populacional (calculada: população / área)
+ *   - PIB per Capita (calculado: PIB / população)
  */
 
 #include <stdio.h>
@@ -18,12 +20,14 @@
 
 /* Estrutura que representa uma carta (cidade) */
 typedef struct {
-    char codigo[4];           /* Ex: "A01" */
+    char codigo[4];                /* Ex: "A01" */
     char nome[50];
     long long populacao;
-    double area;              /* km² */
-    double pib;               /* em bilhões de reais */
+    double area;                   /* km² */
+    double pib;                    /* em bilhões de reais */
     int pontos_turisticos;
+    double densidade_populacional; /* hab/km² - calculado automaticamente */
+    double pib_per_capita;         /* R$/hab  - calculado automaticamente */
 } Carta;
 
 /* Exibe o cabeçalho do programa */
@@ -36,6 +40,20 @@ void exibir_cabecalho() {
 /* Exibe separador visual */
 void exibir_separador() {
     printf("--------------------------------------------\n");
+}
+
+/* Calcula automaticamente densidade populacional e PIB per capita */
+void calcular_propriedades(Carta *carta) {
+    if (carta->area > 0)
+        carta->densidade_populacional = (double)carta->populacao / carta->area;
+    else
+        carta->densidade_populacional = 0.0;
+
+    if (carta->populacao > 0)
+        /* PIB em bilhões → converter para reais (*1e9) antes de dividir */
+        carta->pib_per_capita = (carta->pib * 1e9) / (double)carta->populacao;
+    else
+        carta->pib_per_capita = 0.0;
 }
 
 /* Cadastra os dados de uma carta via terminal */
@@ -64,16 +82,21 @@ void cadastrar_carta(Carta *carta, char estado, int numero) {
 
     printf("Numero de pontos turisticos: ");
     scanf("%d", &carta->pontos_turisticos);
+
+    /* Calcula automaticamente as propriedades derivadas */
+    calcular_propriedades(carta);
 }
 
 /* Exibe os dados de uma carta formatada */
 void exibir_carta(const Carta *carta) {
     printf("\n  Carta: [%s]\n", carta->codigo);
-    printf("  Cidade            : %s\n",   carta->nome);
-    printf("  Populacao         : %lld habitantes\n", carta->populacao);
-    printf("  Area              : %.2f km2\n", carta->area);
-    printf("  PIB               : R$ %.2f bilhoes\n", carta->pib);
-    printf("  Pontos Turisticos : %d\n", carta->pontos_turisticos);
+    printf("  Cidade                 : %s\n",    carta->nome);
+    printf("  Populacao              : %lld habitantes\n", carta->populacao);
+    printf("  Area                   : %.2f km2\n", carta->area);
+    printf("  PIB                    : R$ %.2f bilhoes\n", carta->pib);
+    printf("  Pontos Turisticos      : %d\n", carta->pontos_turisticos);
+    printf("  Densidade Populacional : %.2f hab/km2\n", carta->densidade_populacional);
+    printf("  PIB per Capita         : R$ %.2f\n", carta->pib_per_capita);
 }
 
 int main() {
