@@ -1,15 +1,123 @@
+/*
+ * Super Trunfo - Tema: Países
+ * Cada país é dividido em 8 estados (A-H), cada estado com 4 cidades (1-4).
+ * Código da carta: letra do estado + número da cidade (ex: A01, B03)
+ *
+ * Propriedades de cada cidade:
+ *   - População
+ *   - Área (km²)
+ *   - PIB (em bilhões de reais)
+ *   - Número de pontos turísticos
+ */
+
 #include <stdio.h>
 
-// Desafio Super Trunfo - Países
-// Tema 1 - Cadastro das cartas
-// Objetivo: No nível novato você deve criar as cartas representando as cidades utilizando scanf para entrada de dados e printf para exibir as informações.
+#define NUM_ESTADOS 8
+#define CIDADES_POR_ESTADO 4
+#define TOTAL_CARTAS (NUM_ESTADOS * CIDADES_POR_ESTADO)
+
+/* Estrutura que representa uma carta (cidade) */
+typedef struct {
+    char codigo[4];           /* Ex: "A01" */
+    char nome[50];
+    long long populacao;
+    double area;              /* km² */
+    double pib;               /* em bilhões de reais */
+    int pontos_turisticos;
+} Carta;
+
+/* Exibe o cabeçalho do programa */
+void exibir_cabecalho() {
+    printf("============================================\n");
+    printf("      SUPER TRUNFO - TEMA: PAISES           \n");
+    printf("============================================\n\n");
+}
+
+/* Exibe separador visual */
+void exibir_separador() {
+    printf("--------------------------------------------\n");
+}
+
+/* Cadastra os dados de uma carta via terminal */
+void cadastrar_carta(Carta *carta, char estado, int numero) {
+    /* Gera o código da carta automaticamente */
+    carta->codigo[0] = estado;
+    carta->codigo[1] = '0';
+    carta->codigo[2] = '0' + numero;
+    carta->codigo[3] = '\0';
+
+    printf("\n>>> Cadastrando carta [%s] - Estado %c, Cidade %d <<<\n",
+           carta->codigo, estado, numero);
+    exibir_separador();
+
+    printf("Nome da cidade: ");
+    scanf(" %49[^\n]", carta->nome);
+
+    printf("Populacao (habitantes): ");
+    scanf("%lld", &carta->populacao);
+
+    printf("Area (km2): ");
+    scanf("%lf", &carta->area);
+
+    printf("PIB (em bilhoes de reais): ");
+    scanf("%lf", &carta->pib);
+
+    printf("Numero de pontos turisticos: ");
+    scanf("%d", &carta->pontos_turisticos);
+}
+
+/* Exibe os dados de uma carta formatada */
+void exibir_carta(const Carta *carta) {
+    printf("\n  Carta: [%s]\n", carta->codigo);
+    printf("  Cidade            : %s\n",   carta->nome);
+    printf("  Populacao         : %lld habitantes\n", carta->populacao);
+    printf("  Area              : %.2f km2\n", carta->area);
+    printf("  PIB               : R$ %.2f bilhoes\n", carta->pib);
+    printf("  Pontos Turisticos : %d\n", carta->pontos_turisticos);
+}
 
 int main() {
-  // Área para definição das variáveis para armazenar as propriedades das cidades
+    Carta cartas[TOTAL_CARTAS];
+    char estados[NUM_ESTADOS] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+    int indice = 0;
+    int i, j;
 
-  // Área para entrada de dados
+    exibir_cabecalho();
 
-  // Área para exibição dos dados da cidade
+    printf("Este programa cadastra %d cartas de cidades.\n", TOTAL_CARTAS);
+    printf("Organizadas em %d estados (A a H), com %d cidades cada.\n\n",
+           NUM_ESTADOS, CIDADES_POR_ESTADO);
 
-return 0;
-} 
+    /* ---- FASE DE CADASTRO ---- */
+    printf("============================================\n");
+    printf("           FASE DE CADASTRO                 \n");
+    printf("============================================\n");
+
+    for (i = 0; i < NUM_ESTADOS; i++) {
+        printf("\n*** ESTADO %c ***\n", estados[i]);
+        for (j = 1; j <= CIDADES_POR_ESTADO; j++) {
+            cadastrar_carta(&cartas[indice], estados[i], j);
+            indice++;
+        }
+    }
+
+    /* ---- FASE DE EXIBIÇÃO ---- */
+    printf("\n\n");
+    printf("============================================\n");
+    printf("        CARTAS CADASTRADAS                  \n");
+    printf("============================================\n");
+
+    for (i = 0; i < NUM_ESTADOS; i++) {
+        printf("\n  *** ESTADO %c ***\n", estados[i]);
+        exibir_separador();
+        for (j = 0; j < CIDADES_POR_ESTADO; j++) {
+            exibir_carta(&cartas[i * CIDADES_POR_ESTADO + j]);
+        }
+    }
+
+    printf("\n============================================\n");
+    printf("  Cadastro concluido! Total de cartas: %d   \n", TOTAL_CARTAS);
+    printf("============================================\n\n");
+
+    return 0;
+}
